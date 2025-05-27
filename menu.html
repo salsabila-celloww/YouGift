@@ -1,0 +1,141 @@
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Menu & Order</title>
+  <link rel="stylesheet" href="menu.css" />
+</head>
+<body>
+  <header>
+    <div class="logo-container">
+      <img src="logo1.jpg" alt="Logo" class="logo">
+      <span class="brand-name">Meltyou Gift</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1>Daftar Menu Meltyou Gift</h1>
+    <div class="menu-list">
+      <div class="menu-item">
+        <img src="cokies.jpg" alt="Chocolate Cookies">
+        <h2>Chocolate Cookies</h2>
+        <p>Rp 10.000</p>
+        <button onclick="addToOrder('Chocolate Cookies', 10000)">Pesan</button>
+      </div>
+      <div class="menu-item">
+        <img src="redkies.jpg" alt="Redvelvet Cookies">
+        <h2>Redvelvet Cookies</h2>
+        <p>Rp 15.000</p>
+        <button onclick="addToOrder('Redvelvet Cookies', 15000)">Pesan</button>
+      </div>
+      <div class="menu-item">
+        <img src="dimor.jpg" alt="Dimsum Original">
+        <h2>Dimsum Original</h2>
+        <p>Rp 25.000</p>
+        <button onclick="addToOrder('Dimsum Original', 25000)">Pesan</button>
+      </div>
+      <div class="menu-item">
+        <img src="dimix.jpg" alt="Dimsum Mix">
+        <h2>Dimsum Mix</h2>
+        <p>Rp 40.000</p>
+        <button onclick="addToOrder('Dimsum Mix', 40000)">Pesan</button>
+      </div>
+    </div>
+    <h2>Orderan Kamu</h2>
+    <ul id="order-list"></ul>
+    <p id="total">Total: Rp 0</p>
+
+    <h2>Data Diri</h2>
+    <form id="user-form">
+      <label for="nama">Nama:</label><br>
+      <input type="text" id="nama" name="nama" required><br><br>
+      <label for="nohp">No HP:</label><br>
+      <input type="tel" id="nohp" name="nohp" required><br><br>
+      <label for="alamat">Alamat:</label><br>
+      <textarea id="alamat" name="alamat" rows="3" required></textarea><br><br>
+    </form>
+
+    <button class="checkout-btn" onclick="checkout()">Checkout</button>
+  </div>
+  <script>
+    let order = [];
+    let total = 0;
+    
+    // Menggunakan event delegation untuk tombol pesan
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelector('.menu-list').addEventListener('click', function(e) {
+        if (e.target.classList.contains('order-btn')) {
+          const name = e.target.getAttribute('data-name');
+          const price = parseInt(e.target.getAttribute('data-price'));
+          addToOrder(name, price);
+        }
+      });
+
+      // Menangani tombol checkout
+      document.getElementById('checkout-btn').addEventListener('click', checkout);
+    });
+
+    function addToOrder(nama, harga) {
+      order.push({ nama, harga });
+      total += harga;
+      renderOrder();
+    }
+
+    function renderOrder() {
+      const orderList = document.getElementById("order-list");
+      const totalDisplay = document.getElementById("total");
+      orderList.innerHTML = "";
+
+      order.forEach((item, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          ${item.nama} - Rp ${item.harga.toLocaleString('id-ID')}
+          <button class="cancel-btn" data-index="${index}">Cancel</button>
+        `;
+        orderList.appendChild(li);
+      });
+
+      // Menambahkan event listener untuk tombol cancel
+      document.querySelectorAll('.cancel-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const index = parseInt(this.getAttribute('data-index'));
+          removeItem(index);
+        });
+      });
+
+      totalDisplay.textContent = `Total: Rp ${total.toLocaleString('id-ID')}`;
+    }
+
+    function removeItem(index) {
+      total -= order[index].harga;
+      order.splice(index, 1);
+      renderOrder();
+    }
+
+    function checkout() {
+      const nama = document.getElementById("nama").value.trim();
+      const nohp = document.getElementById("nohp").value.trim();
+      const alamat = document.getElementById("alamat").value.trim();
+
+      if (order.length === 0) {
+        alert("Maaf, kamu belum pesan apa-apa 😅");
+        return;
+      }
+
+      if (!nama || !nohp || !alamat) {
+        alert("Mohon lengkapi data diri sebelum checkout 😄");
+        return;
+      }
+
+      alert(`Terima kasih sudah order, ${nama}! 🥰\nKami akan hubungi kamu di ${nohp}.`);
+
+      // Reset semua
+      order = [];
+      total = 0;
+      document.getElementById("user-form").reset();
+      renderOrder();
+    }
+  </script>
+</body>
+</html>
+  
